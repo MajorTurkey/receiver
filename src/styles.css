@@ -152,20 +152,21 @@
   display: grid;
   place-items: center;
   height: 4.6rem;
-  border: 0;
-  border-radius: 0.7rem;
-  background: #161b24;
+  border: 1px solid color-mix(in oklab, white 28%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, white 10%, transparent);
   color: var(--color-fg);
-  box-shadow: inset 0 -0.28rem 0 #0a0c10;
+  backdrop-filter: blur(12px);
 }
 
 .pad:active {
-  transform: translateY(2px);
+  transform: translateY(1px);
 }
 
 .pad-play {
-  background: var(--lamp);
-  color: var(--lamp-ink);
+  background: color-mix(in oklab, var(--lamp) 38%, transparent);
+  color: #fff;
+  border-color: color-mix(in oklab, var(--lamp) 70%, white);
 }
 
 .elapsed {
@@ -182,40 +183,35 @@
 }
 
 .key {
-  min-height: 5.1rem;
-  border: 0;
-  border-radius: 0.7rem;
-  padding: 0.65rem 0.8rem;
-  text-align: left;
-  color: #14080a;
-  box-shadow: inset 0 -0.35rem 0 color-mix(in oklab, black 28%, transparent);
+  --key: #ff7a2f;
+  min-height: 4.75rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in oklab, var(--key) 55%, white);
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  text-align: center;
+  color: #f6f3ee;
+  background: color-mix(in oklab, var(--key) 22%, transparent);
+  backdrop-filter: blur(14px);
 }
 
-.key[data-tone="amber"] { background: #ff7a2f; }
-.key[data-tone="teal"] { background: #1ec8b8; }
-.key[data-tone="cobalt"] { background: #4d86ff; color: #f4f7ff; }
-.key[data-tone="rose"] { background: #ff4d8d; color: #fff7fb; }
-.key[data-on="false"] { filter: saturate(0.85) brightness(0.62); }
+.key[data-tone="amber"] { --key: #ff7a2f; }
+.key[data-tone="teal"] { --key: #1ec8b8; }
+.key[data-tone="cobalt"] { --key: #4d86ff; }
+.key[data-tone="rose"] { --key: #ff4d8d; }
 .key[data-on="true"] {
-  filter: none;
-  outline: 2px solid #fff;
-  outline-offset: 2px;
-}
-
-.key-index {
-  display: block;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  background: color-mix(in oklab, var(--key) 46%, transparent);
+  border-color: color-mix(in oklab, var(--key) 30%, white);
 }
 
 .key-name {
-  display: block;
-  margin-top: 0.15rem;
-  font-size: 1.35rem;
-  font-weight: 700;
+  font-family: Oswald, "Arial Narrow", sans-serif;
+  font-size: 1.45rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   line-height: 1;
-  letter-spacing: -0.03em;
 }
 
 .bay {
@@ -234,20 +230,36 @@
 
 .chip {
   flex: 0 0 auto;
-  max-width: 14rem;
-  height: 3.1rem;
-  border: 1px solid #2c3442;
-  border-radius: 0.55rem;
-  background: #12161e;
+  max-width: 16rem;
+  height: 3.15rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in oklab, white 22%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, white 8%, transparent);
   color: var(--color-fg);
-  padding: 0.3rem 0.7rem;
-  text-align: left;
+  padding: 0 1.1rem;
+  text-align: center;
+  font-family: Oswald, "Arial Narrow", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  backdrop-filter: blur(12px);
+}
+
+.chip span {
+  display: block;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .chip[data-on="true"] {
-  background: var(--lamp);
-  color: var(--lamp-ink);
-  border-color: #fff;
+  background: color-mix(in oklab, var(--lamp) 40%, transparent);
+  color: #fff;
+  border-color: color-mix(in oklab, var(--lamp) 65%, white);
 }
 
 .link-row {
@@ -256,20 +268,26 @@
 }
 
 .link-row input {
-  height: 3.1rem;
+  height: 3.15rem;
   width: 16rem;
-  border-radius: 0.55rem;
-  background: #12161e;
+  border-radius: 999px;
+  background: color-mix(in oklab, white 8%, transparent);
+  border-color: color-mix(in oklab, white 18%, transparent);
 }
 
 .add {
-  height: 3.1rem;
-  min-width: 4.5rem;
-  border: 0;
-  border-radius: 0.55rem;
-  background: var(--lamp);
-  color: var(--lamp-ink);
-  font-weight: 700;
+  height: 3.15rem;
+  min-width: 5rem;
+  padding: 0 1.1rem;
+  border: 1px solid color-mix(in oklab, var(--lamp) 60%, white);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--lamp) 36%, transparent);
+  color: #fff;
+  font-family: Oswald, "Arial Narrow", sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
 .add:disabled { opacity: 0.4; }

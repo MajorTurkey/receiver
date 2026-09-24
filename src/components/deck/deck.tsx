@@ -198,7 +198,7 @@ export function Deck() {
         </div>
 
         <div className="dock">
-          {STATIONS.map((item, n) => (
+          {STATIONS.map((item) => (
             <button
               key={item.id}
               type="button"
@@ -207,7 +207,6 @@ export function Deck() {
               className="key"
               onClick={() => tune(item.id)}
             >
-              <span className="key-index">{String(n + 1).padStart(2, "0")}</span>
               <span className="key-name">{item.name}</span>
             </button>
           ))}
@@ -223,8 +222,7 @@ export function Deck() {
                 data-on={i === index}
                 onClick={() => play(i)}
               >
-                <span className="block truncate text-sm font-semibold">{item.title}</span>
-                <span className="block truncate text-xs opacity-75">{item.author}</span>
+                <span>{item.title}</span>
               </button>
             ))}
           </div>
