@@ -4,10 +4,13 @@ export type Track = {
   author: string;
 };
 
+export type Tone = "amber" | "teal" | "cobalt" | "rose" | "gold";
+
 export type Station = {
   id: string;
   name: string;
   note: string;
+  tone: Tone;
   tracks: Track[];
 };
 
@@ -15,7 +18,8 @@ export const STATIONS: Station[] = [
   {
     id: "late",
     name: "Late room",
-    note: "Long mixes for a dim screen",
+    note: "Long mixes",
+    tone: "amber",
     tracks: [
       { id: "jfKfPfyJRdk", title: "Beats to relax", author: "Lofi Girl" },
       { id: "lTRiuFIWV54", title: "1 A.M. session", author: "Lofi Girl" },
@@ -25,7 +29,8 @@ export const STATIONS: Station[] = [
   {
     id: "still",
     name: "Still",
-    note: "Ambient, sleep, slow synth",
+    note: "Ambient",
+    tone: "teal",
     tracks: [
       { id: "DWcJFNfaw9c", title: "Beats to sleep", author: "Lofi Girl" },
       { id: "2OEL4P1Rz04", title: "Hidden Valley", author: "Soothing Relaxation" },
@@ -35,7 +40,8 @@ export const STATIONS: Station[] = [
   {
     id: "keys",
     name: "Keys",
-    note: "Piano and a quiet jazz room",
+    note: "Piano and jazz",
+    tone: "cobalt",
     tracks: [
       { id: "9E6b3swbnWg", title: "Nocturne in E-flat", author: "Chopin" },
       { id: "kgx4WGK0oNU", title: "Jazz room", author: "Abao in Tokyo" },
@@ -45,7 +51,8 @@ export const STATIONS: Station[] = [
   {
     id: "singles",
     name: "Singles",
-    note: "Official videos, when the label allows the player",
+    note: "Official videos",
+    tone: "rose",
     tracks: [
       { id: "fJ9rUzIMcZQ", title: "Bohemian Rhapsody", author: "Queen" },
       { id: "kXYiU_JCYtU", title: "Numb", author: "Linkin Park" },
