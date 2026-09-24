@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Pause, Play, SkipBack, SkipForward } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { STATIONS, type Tone } from "@/lib/music/catalog";
+import { STATIONS, TONES } from "@/lib/music/catalog";
 import { parseVideoId } from "@/lib/music/parse";
 import { resolveTrack } from "@/lib/music/resolve";
 import { currentTrack, useDeck } from "@/lib/music/store";
@@ -24,13 +24,14 @@ export function Deck() {
   const queue = useDeck((s) => s.queue);
   const index = useDeck((s) => s.index);
   const tune = useDeck((s) => s.tune);
+  const paint = useDeck((s) => s.paint);
+  const tone = useDeck((s) => s.tone);
   const play = useDeck((s) => s.play);
   const next = useDeck((s) => s.next);
   const prev = useDeck((s) => s.prev);
   const add = useDeck((s) => s.add);
   const track = currentTrack({ queue, index });
   const station = STATIONS.find((item) => item.id === stationId);
-  const tone: Tone = station?.tone ?? "gold";
 
   const [raw, setRaw] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
@@ -163,7 +164,20 @@ export function Deck() {
     <div className="deck" data-tone={tone}>
       <div className="dash">
         <header className="bezel">
-          <span>{station ? station.name : "Source"}</span>
+          <div className="swatches" role="group" aria-label="Color">
+            {TONES.map((item) => (
+              <button
+                key={item}
+                type="button"
+                className="swatch"
+                data-tone={item}
+                data-on={item === tone}
+                aria-label={item}
+                aria-pressed={item === tone}
+                onClick={() => paint(item)}
+              />
+            ))}
+          </div>
           <strong>Receiver</strong>
           <span>{now.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</span>
         </header>

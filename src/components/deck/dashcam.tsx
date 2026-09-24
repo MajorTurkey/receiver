@@ -21,22 +21,12 @@ function saveClip(chunks: Blob[]) {
 }
 
 export function DashCam() {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const liveRef = useRef(false);
   const rollRef = useRef<number | null>(null);
   const [recording, setRecording] = useState(false);
-  const [preview, setPreview] = useState(true);
   const [notice, setNotice] = useState<string | null>(null);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    const stream = streamRef.current;
-    if (!video || !stream || !preview) return;
-    video.srcObject = stream;
-    void video.play().catch(() => undefined);
-  }, [preview, recording]);
 
   useEffect(() => {
     return () => {
@@ -99,7 +89,6 @@ export function DashCam() {
         return;
       }
       setRecording(true);
-      setPreview(true);
       rollRef.current = window.setInterval(() => {
         if (recorderRef.current?.state === "recording") recorderRef.current.stop();
       }, ROLL_MS);
@@ -124,19 +113,9 @@ export function DashCam() {
 
   return (
     <div className="cam">
-      <button type="button" className="cam-btn" data-on={recording} onClick={recording ? stop : start}>
+      <button type="button" className="cam-btn" data-on={recording} aria-pressed={recording} onClick={recording ? stop : start}>
         {recording ? "Stop" : "Rec"}
       </button>
-      {recording && preview ? (
-        <button type="button" className="cam-view" onClick={() => setPreview(false)} aria-label="Hide road preview">
-          <video ref={videoRef} muted playsInline autoPlay />
-        </button>
-      ) : null}
-      {recording && !preview ? (
-        <button type="button" className="cam-btn" onClick={() => setPreview(true)}>
-          View
-        </button>
-      ) : null}
       {notice ? <p className="cam-note">{notice}</p> : null}
     </div>
   );

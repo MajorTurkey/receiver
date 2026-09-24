@@ -83,6 +83,31 @@
   font-weight: 700;
 }
 
+.swatches {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.swatch {
+  width: 0.85rem;
+  height: 0.85rem;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, white 40%, transparent);
+  touch-action: manipulation;
+}
+
+.swatch[data-tone="amber"] { background: #ff7a2f; }
+.swatch[data-tone="teal"] { background: #1ec8b8; }
+.swatch[data-tone="cobalt"] { background: #4d86ff; }
+.swatch[data-tone="rose"] { background: #ff4d8d; }
+.swatch[data-tone="gold"] { background: #f5c451; }
+.swatch[data-on="true"] {
+  outline: 1px solid #fff;
+  outline-offset: 2px;
+}
+
 .screen {
   min-height: 0;
   display: grid;
@@ -443,12 +468,8 @@
   gap: 0.4rem;
 }
 
-.cam-btn,
-.cam-view {
-  touch-action: manipulation;
-}
-
 .cam-btn {
+  touch-action: manipulation;
   height: 2.55rem;
   padding: 0.1rem 0.95rem 0;
   border-radius: 999px;
@@ -469,25 +490,6 @@
   border-color: color-mix(in oklab, #ff4d6a 70%, white);
   background-color: color-mix(in oklab, #ff3355 46%, rgb(8 10 16 / 70%));
   color: #fff;
-}
-
-.cam-view {
-  width: 10.5rem;
-  aspect-ratio: 16 / 9;
-  padding: 0;
-  overflow: hidden;
-  border-radius: 0.7rem;
-  border: 1px solid color-mix(in oklab, white 28%, transparent);
-  background: #000;
-  box-shadow: 0 12px 28px rgb(0 0 0 / 45%);
-}
-
-.cam-view video {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-  pointer-events: none;
 }
 
 .cam-note {

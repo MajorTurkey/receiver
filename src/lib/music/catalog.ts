@@ -6,6 +6,8 @@ export type Track = {
 
 export type Tone = "amber" | "teal" | "cobalt" | "rose" | "gold";
 
+export const TONES: Tone[] = ["amber", "teal", "cobalt", "rose", "gold"];
+
 export type Station = {
   id: string;
   name: string;

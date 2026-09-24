@@ -1,12 +1,14 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { DEFAULT_STATION, STATIONS, type Track } from "./catalog";
+import { DEFAULT_STATION, STATIONS, type Tone, type Track } from "./catalog";
 
 type DeckState = {
   stationId: string;
+  tone: Tone;
   queue: Track[];
   index: number;
   tune: (stationId: string) => void;
+  paint: (tone: Tone) => void;
   play: (index: number) => void;
   next: () => void;
   prev: () => void;
@@ -18,12 +20,14 @@ export const useDeck = create<DeckState>()(
   persist(
     (set, get) => ({
       stationId: DEFAULT_STATION.id,
+      tone: "amber",
       queue: DEFAULT_STATION.tracks,
       index: 0,
       tune: (stationId) => {
         const station = STATIONS.find((s) => s.id === stationId) ?? DEFAULT_STATION;
         set({ stationId: station.id, queue: station.tracks, index: 0 });
       },
+      paint: (tone) => set({ tone }),
       play: (index) => {
         const { queue } = get();
         if (index < 0 || index >= queue.length) return;
