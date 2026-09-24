@@ -54,6 +54,46 @@ export function Deck() {
   }, []);
 
   useEffect(() => {
+    const stop = (event: Event) => event.preventDefault();
+    const stopWheelZoom = (event: WheelEvent) => {
+      if (event.ctrlKey) event.preventDefault();
+    };
+    document.addEventListener("gesturestart", stop);
+    document.addEventListener("gesturechange", stop);
+    window.addEventListener("wheel", stopWheelZoom, { passive: false });
+
+    let wake: WakeLockSentinel | null = null;
+    let gone = false;
+    const stayAwake = () => {
+      if (gone || !("wakeLock" in navigator)) return;
+      void navigator.wakeLock.request("screen").then(
+        (sentinel) => {
+          wake = sentinel;
+        },
+        () => {
+          // A later tap retries if Chrome wants a gesture first.
+        },
+      );
+    };
+    const onVisible = () => {
+      if (document.visibilityState === "visible") stayAwake();
+    };
+    stayAwake();
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("pointerdown", stayAwake);
+
+    return () => {
+      gone = true;
+      document.removeEventListener("gesturestart", stop);
+      document.removeEventListener("gesturechange", stop);
+      window.removeEventListener("wheel", stopWheelZoom);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("pointerdown", stayAwake);
+      void wake?.release();
+    };
+  }, []);
+
+  useEffect(() => {
     if (!track || !("mediaSession" in navigator)) return;
     navigator.mediaSession.metadata = new MediaMetadata({
       title: track.title,
