@@ -6,6 +6,7 @@ import { parseVideoId } from "@/lib/music/parse";
 import { resolveTrack } from "@/lib/music/resolve";
 import { currentTrack, useDeck } from "@/lib/music/store";
 import { Stage } from "./stage";
+import { DashCam } from "./dashcam";
 
 function pad(n: number) {
   return String(n).padStart(2, "0");
@@ -290,6 +291,7 @@ export function Deck() {
         </div>
         <div className="underglow" />
       </div>
+      <DashCam />
     </div>
   );
 }
