@@ -16,9 +16,9 @@ export const Route = createRootRoute({
       { title: APP_NAME },
       {
         name: "description",
-        content: "A Kindle listening deck. Paste a YouTube Music link and play it here.",
+        content: "A widescreen dash receiver. Paste a YouTube Music link and play it here.",
       },
-      { name: "theme-color", content: "#0c0c0e" },
+      { name: "theme-color", content: "#07080c" },
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
@@ -27,7 +27,7 @@ export const Route = createRootRoute({
       { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Figtree:wght@500;600;700&display=swap",
       },
     ],
   }),

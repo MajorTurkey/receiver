@@ -39,12 +39,18 @@ export function Deck() {
   const [seekTo, setSeekTo] = useState<number | null>(null);
   const [time, setTime] = useState({ current: 0, duration: 0 });
   const [ready, setReady] = useState(false);
+  const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
     void Promise.resolve(useDeck.persist.rehydrate()).then(
       () => setReady(true),
       () => setReady(true),
     );
+  }, []);
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(id);
   }, []);
 
   useEffect(() => {
@@ -107,15 +113,122 @@ export function Deck() {
     }
   }
 
+  const hours = now.getHours();
+  const meridian = hours >= 12 ? "PM" : "AM";
+  const hourFace = String(hours % 12 || 12);
+  const minuteFace = pad(now.getMinutes());
+
   return (
     <div className="deck" data-tone={tone}>
-      <div className="face">
-        <header className="head">
-          <div>
-            <p className="text-sm font-semibold tracking-wide text-muted">Deck</p>
-            <h1 className="brand">Receiver</h1>
+      <div className="dash">
+        <header className="bezel">
+          <span>{station ? station.name : "Source"}</span>
+          <strong>Receiver</strong>
+          <span>{now.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</span>
+        </header>
+
+        <div className="screen">
+          <div className="stage-wrap">
+            {ready && track ? (
+              <Stage
+                videoId={track.id}
+                onEnded={next}
+                onPlaying={setPlaying}
+                onTime={(current, duration) => setTime({ current, duration })}
+                command={command}
+                seekTo={seekTo}
+                onCommandDone={() => {
+                  setCommand(null);
+                  setSeekTo(null);
+                }}
+              />
+            ) : (
+              <div className="stage" />
+            )}
           </div>
-          <form onSubmit={onAdd} className="min-w-0 flex-1">
+
+          <section className="cluster">
+            <div>
+              <p className="meridian">{meridian}</p>
+              <p className="wall">
+                {hourFace}:{minuteFace}
+              </p>
+            </div>
+            <div className="min-w-0">
+              <h2 className="track-title">{track?.title ?? "Nothing queued"}</h2>
+              <p className="mt-1 truncate text-base text-muted">{track?.author ?? "Pick a station"}</p>
+              <p className="elapsed mt-1">
+                {clock(time.current)} <span className="text-muted">/ {clock(time.duration)}</span>
+              </p>
+              <label className="block">
+                <span className="sr-only">Position</span>
+                <input
+                  className="scrub"
+                  type="range"
+                  min={0}
+                  max={time.duration || 0}
+                  step={1}
+                  value={Math.min(time.current, time.duration || 0)}
+                  disabled={time.duration <= 0}
+                  onChange={(event) => {
+                    const nextTime = Number(event.target.value);
+                    setTime((prev) => ({ ...prev, current: nextTime }));
+                    setSeekTo(nextTime);
+                  }}
+                />
+              </label>
+            </div>
+            <div className="transport">
+              <button type="button" className="pad" aria-label="Previous" onClick={prev}>
+                <SkipBack className="size-8" />
+              </button>
+              <button
+                type="button"
+                className="pad pad-play"
+                aria-label={playing ? "Pause" : "Play"}
+                onClick={() => setCommand(playing ? "pause" : "play")}
+              >
+                {playing ? <Pause className="size-10" /> : <Play className="size-10" />}
+              </button>
+              <button type="button" className="pad" aria-label="Next" onClick={next}>
+                <SkipForward className="size-8" />
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <div className="dock">
+          {STATIONS.map((item, n) => (
+            <button
+              key={item.id}
+              type="button"
+              data-tone={item.tone}
+              data-on={item.id === stationId}
+              className="key"
+              onClick={() => tune(item.id)}
+            >
+              <span className="key-index">{String(n + 1).padStart(2, "0")}</span>
+              <span className="key-name">{item.name}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="bay">
+          <div className="queue" aria-label="Queue">
+            {queue.map((item, i) => (
+              <button
+                key={`${item.id}-${i}`}
+                type="button"
+                className="chip"
+                data-on={i === index}
+                onClick={() => play(i)}
+              >
+                <span className="block truncate text-sm font-semibold">{item.title}</span>
+                <span className="block truncate text-xs opacity-75">{item.author}</span>
+              </button>
+            ))}
+          </div>
+          <form onSubmit={onAdd}>
             <label className="sr-only" htmlFor="link">
               YouTube Music link
             </label>
@@ -124,117 +237,20 @@ export function Deck() {
                 id="link"
                 value={raw}
                 onChange={(event) => setRaw(event.target.value)}
-                placeholder="Paste a YouTube Music link"
+                placeholder="Paste a link"
                 autoCapitalize="off"
                 autoCorrect="off"
                 spellCheck={false}
                 inputMode="url"
               />
               <button className="add" type="submit" disabled={busy || raw.trim().length === 0}>
-                {busy ? "Adding" : "Add"}
+                {busy ? "…" : "Add"}
               </button>
             </div>
-            {notice ? <p className="mt-2 text-sm text-muted">{notice}</p> : null}
+            {notice ? <p className="mt-1 text-xs text-muted">{notice}</p> : null}
           </form>
-        </header>
-
-        <div className="keys" role="list">
-          {STATIONS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              role="listitem"
-              data-tone={item.tone}
-              data-on={item.id === stationId}
-              className="key"
-              onClick={() => tune(item.id)}
-            >
-              <span className="key-name">{item.name}</span>
-              <span className="key-note">{item.note}</span>
-            </button>
-          ))}
         </div>
-
-        <div className="now">
-          <p className="text-base font-semibold" style={{ color: "var(--lamp)" }}>
-            {station ? station.name : "Your queue"}
-          </p>
-          <h2>{track?.title ?? "Nothing queued"}</h2>
-          <p className="mt-1 text-lg text-muted">{track?.author ?? "Pick a station"}</p>
-        </div>
-
-        <div className="stage-wrap">
-          {ready && track ? (
-            <Stage
-              videoId={track.id}
-              onEnded={next}
-              onPlaying={setPlaying}
-              onTime={(current, duration) => setTime({ current, duration })}
-              command={command}
-              seekTo={seekTo}
-              onCommandDone={() => {
-                setCommand(null);
-                setSeekTo(null);
-              }}
-            />
-          ) : (
-            <div className="stage" />
-          )}
-        </div>
-
-        <label className="block">
-          <span className="sr-only">Position</span>
-          <input
-            className="scrub"
-            type="range"
-            min={0}
-            max={time.duration || 0}
-            step={1}
-            value={Math.min(time.current, time.duration || 0)}
-            disabled={time.duration <= 0}
-            onChange={(event) => {
-              const nextTime = Number(event.target.value);
-              setTime((prev) => ({ ...prev, current: nextTime }));
-              setSeekTo(nextTime);
-            }}
-          />
-        </label>
-
-        <div className="transport">
-          <button type="button" className="pad pad-skip" aria-label="Previous" onClick={prev}>
-            <SkipBack className="size-8" />
-          </button>
-          <button
-            type="button"
-            className="pad pad-play"
-            aria-label={playing ? "Pause" : "Play"}
-            onClick={() => setCommand(playing ? "pause" : "play")}
-          >
-            {playing ? <Pause className="size-12" /> : <Play className="size-12" />}
-          </button>
-          <button type="button" className="pad pad-next pad-skip" aria-label="Next" onClick={next}>
-            <SkipForward className="size-8" />
-          </button>
-          <p className="clock">
-            {clock(time.current)}
-            <span className="block text-sm font-medium text-muted">/ {clock(time.duration)}</span>
-          </p>
-        </div>
-
-        <div className="queue" aria-label="Queue">
-          {queue.map((item, i) => (
-            <button
-              key={`${item.id}-${i}`}
-              type="button"
-              className="chip"
-              data-on={i === index}
-              onClick={() => play(i)}
-            >
-              <span className="block truncate text-base font-semibold">{item.title}</span>
-              <span className="block truncate text-sm opacity-80">{item.author}</span>
-            </button>
-          ))}
-        </div>
+        <div className="underglow" />
       </div>
     </div>
   );
