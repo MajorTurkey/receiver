@@ -1,9 +1,10 @@
 import { FormEvent, useEffect, useState } from "react";
-import { Pause, Play, SkipBack, SkipForward } from "lucide-react";
+import { Pause, Play, Search, SkipBack, SkipForward } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { STATIONS, TONES } from "@/lib/music/catalog";
+import { STATIONS, TONES, type Track } from "@/lib/music/catalog";
 import { parseVideoId } from "@/lib/music/parse";
 import { resolveTrack } from "@/lib/music/resolve";
+import { searchCatalog, searchMore } from "@/lib/music/search";
 import { currentTrack, useDeck } from "@/lib/music/store";
 import { Stage } from "./stage";
 import { DashCam } from "./dashcam";
@@ -30,12 +31,16 @@ export function Deck() {
   const next = useDeck((s) => s.next);
   const prev = useDeck((s) => s.prev);
   const add = useDeck((s) => s.add);
+  const load = useDeck((s) => s.load);
   const track = currentTrack({ queue, index });
   const station = STATIONS.find((item) => item.id === stationId);
 
   const [raw, setRaw] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [finder, setFinder] = useState(false);
+  const [hits, setHits] = useState<Track[]>([]);
+  const [more, setMore] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
   const [command, setCommand] = useState<"play" | "pause" | null>(null);
   const [seekTo, setSeekTo] = useState<number | null>(null);
@@ -135,21 +140,43 @@ export function Deck() {
 
   async function onAdd(event: FormEvent) {
     event.preventDefault();
-    const id = parseVideoId(raw);
-    if (!id) {
-      setNotice("Paste a YouTube or YouTube Music link.");
-      return;
-    }
+    const text = raw.trim();
+    if (!text) return;
     setBusy(true);
     setNotice(null);
     try {
-      const resolved = await resolveTrack({ data: { raw } });
-      add(resolved);
-      setRaw("");
+      if (parseVideoId(text)) {
+        const resolved = await resolveTrack({ data: { raw: text } });
+        add(resolved);
+        setRaw("");
+        setFinder(false);
+        return;
+      }
+      const page = await searchCatalog({ data: { query: text } });
+      setHits(page.tracks);
+      setMore(page.more);
     } catch (err) {
-      add({ id, title: "YouTube", author: "Unknown" });
-      setRaw("");
-      setNotice(err instanceof Error ? err.message : "Added without a title.");
+      setHits([]);
+      setMore(null);
+      setNotice(err instanceof Error ? err.message : "Search failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onMore() {
+    if (!more) return;
+    setBusy(true);
+    setNotice(null);
+    try {
+      const page = await searchMore({ data: { token: more } });
+      setHits((current) => {
+        const seen = new Set(current.map((item) => item.id));
+        return [...current, ...page.tracks.filter((item) => !seen.has(item.id))];
+      });
+      setMore(page.more);
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : "No further songs.");
     } finally {
       setBusy(false);
     }
@@ -162,7 +189,7 @@ export function Deck() {
 
   return (
     <div className="deck" data-tone={tone}>
-      <div className="dash">
+      <div className="dash" data-finder={finder}>
         <header className="bezel">
           <div className="swatches" role="group" aria-label="Color">
             {TONES.map((item) => (
@@ -253,59 +280,103 @@ export function Deck() {
         </div>
 
         <div className="dock">
-          {STATIONS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              data-tone={item.tone}
-              data-on={item.id === stationId}
-              className="key"
-              onClick={() => tune(item.id)}
-            >
-              <i className="led" aria-hidden />
-              <span className="key-name">{item.name}</span>
-            </button>
-          ))}
+          <button
+            type="button"
+            className="search-key"
+            data-on={finder}
+            aria-pressed={finder}
+            onClick={() => setFinder((open) => !open)}
+          >
+            <Search className="size-6" />
+            <span>Search</span>
+          </button>
+          <div className="stations" aria-label="Stations">
+            {STATIONS.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className="station"
+                data-on={item.id === stationId}
+                onClick={() => {
+                  tune(item.id);
+                  setFinder(false);
+                }}
+              >
+                <span className="station-art" data-tone={item.tone}>
+                  {item.name.slice(0, 1)}
+                </span>
+                <span className="station-copy">
+                  <span className="station-name">{item.name}</span>
+                  <span className="station-note">{item.note}</span>
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="bay">
-          <ol className="program" aria-label="Queue">
-            {queue.map((item, i) => (
-              <li key={`${item.id}-${i}`}>
-                <button
-                  type="button"
-                  className="program-row"
-                  data-on={i === index}
-                  onClick={() => play(i)}
-                >
-                  <span className="program-no">{pad(i + 1)}</span>
-                  <span className="program-title">{item.title}</span>
-                </button>
-              </li>
-            ))}
-          </ol>
-          <form className="slot" onSubmit={onAdd}>
-            <label className="sr-only" htmlFor="link">
-              YouTube Music link
-            </label>
+        {finder ? (
+          <form className="finder" onSubmit={onAdd}>
             <div className="link-row">
+              <label className="sr-only" htmlFor="link">
+                Search YouTube Music
+              </label>
               <Input
                 id="link"
                 value={raw}
                 onChange={(event) => setRaw(event.target.value)}
-                placeholder="Load a link"
+                placeholder="Song, artist, or a link"
                 autoCapitalize="off"
                 autoCorrect="off"
                 spellCheck={false}
-                inputMode="url"
+                enterKeyHint="search"
               />
-              <button className="load" type="submit" disabled={busy || raw.trim().length === 0}>
-                {busy ? "…" : "Load"}
+              <button className="load" type="submit" disabled={busy || raw.trim().length < 2}>
+                {busy ? "…" : "Search"}
               </button>
             </div>
+            <ol className="finder-list" aria-label="Search results">
+              {hits.map((item, i) => (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    className="hit"
+                    onClick={() => {
+                      load(hits, i, "search");
+                      setFinder(false);
+                    }}
+                  >
+                    <span className="hit-title">{item.title}</span>
+                    <span className="hit-author">{item.author}</span>
+                  </button>
+                </li>
+              ))}
+            </ol>
             {notice ? <p className="slot-note">{notice}</p> : null}
+            {more ? (
+              <button className="more" type="button" disabled={busy} onClick={onMore}>
+                More songs
+              </button>
+            ) : null}
           </form>
-        </div>
+        ) : (
+          <div className="bay">
+            <ol className="program" aria-label="Queue">
+              {queue.map((item, i) => (
+                <li key={`${item.id}-${i}`}>
+                  <button
+                    type="button"
+                    className="program-row"
+                    data-on={i === index}
+                    onClick={() => play(i)}
+                  >
+                    <span className="program-no">{pad(i + 1)}</span>
+                    <span className="program-title">{item.title}</span>
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
         <div className="underglow" />
       </div>
       <DashCam />

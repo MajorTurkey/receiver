@@ -13,6 +13,7 @@ type DeckState = {
   next: () => void;
   prev: () => void;
   add: (track: Track) => void;
+  load: (tracks: Track[], index: number, stationId: string) => void;
   remove: (index: number) => void;
 };
 
@@ -48,6 +49,11 @@ export const useDeck = create<DeckState>()(
         const without = queue.filter((item) => item.id !== track.id);
         const nextQueue = [...without, track];
         set({ queue: nextQueue, index: nextQueue.length - 1, stationId: "custom" });
+      },
+      load: (tracks, index, stationId) => {
+        if (tracks.length === 0) return;
+        const next = Math.max(0, Math.min(index, tracks.length - 1));
+        set({ queue: tracks, index: next, stationId });
       },
       remove: (index) => {
         const { queue, index: current } = get();
