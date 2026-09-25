@@ -9,3 +9,8 @@ artifacts
 .grok/*
 !.grok/app-env.json
 .node_modules.lock
+android/local.properties
+android/.gradle
+android/app/build
+android/build
+*.jks

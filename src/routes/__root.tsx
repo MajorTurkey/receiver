@@ -1,9 +1,18 @@
+import { useEffect } from "react";
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "Receiver";
+
+function RegisterShell() {
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return;
+    void navigator.serviceWorker.register("/sw.js");
+  }, []);
+  return null;
+}
 
 export const Route = createRootRoute({
   head: () => ({
@@ -16,7 +25,7 @@ export const Route = createRootRoute({
       { title: APP_NAME },
       {
         name: "description",
-        content: "A widescreen dash receiver. Paste a YouTube Music link and play it here.",
+        content: "Dash receiver for YouTube Music. Opens on the device. Playback needs a connection.",
       },
       { name: "theme-color", content: "#07080c" },
     ],
@@ -38,6 +47,7 @@ export const Route = createRootRoute({
       </head>
       <body>
         <PreviewHostBridge />
+        <RegisterShell />
         <AuthProvider>
           <Outlet />
         </AuthProvider>
