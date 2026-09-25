@@ -240,7 +240,14 @@ export function Deck() {
             ))}
           </div>
           <strong>Receiver</strong>
-          <span>{now.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</span>
+          <div className="bezel-side">
+            <time dateTime={now.toISOString()}>
+              {hourFace}:{minuteFace}
+              <span>{meridian}</span>
+            </time>
+            <span>{now.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</span>
+            <DashCam />
+          </div>
         </header>
 
         <div className="screen">
@@ -264,18 +271,18 @@ export function Deck() {
           </div>
 
           <section className="cluster">
-            <div>
-              <p className="meridian">{meridian}</p>
-              <p className="wall">
-                {hourFace}:{minuteFace}
+            <div className="readout">
+              <p className="source">
+                {picking ? "Loading" : (station?.name ?? (stationId === "search" ? "Search" : "Receiver"))}
               </p>
+              <h2 className="track-title">{track?.title ?? "Nothing queued"}</h2>
+              <p className="artist">{track?.author ?? "Pick a genre"}</p>
             </div>
             <div className="min-w-0">
-              <h2 className="track-title">{track?.title ?? "Nothing queued"}</h2>
-              <p className="mt-1 truncate text-base text-muted">{track?.author ?? "Pick a station"}</p>
-              <p className="elapsed mt-1">
-                {clock(time.current)} <span className="text-muted">/ {clock(time.duration)}</span>
-              </p>
+              <div className="time-row">
+                <span className="elapsed">{clock(time.current)}</span>
+                <span>{clock(time.duration)}</span>
+              </div>
               <label className="block">
                 <span className="sr-only">Position</span>
                 <input
@@ -329,17 +336,12 @@ export function Deck() {
               <button
                 key={item.id}
                 type="button"
-                className="station"
+                className="genre"
                 data-on={item.id === stationId || item.id === picking}
                 onClick={() => void openGenre(item)}
               >
-                <span className="station-art" data-tone={item.tone}>
-                  {item.mark}
-                </span>
-                <span className="station-copy">
-                  <span className="station-name">{item.name}</span>
-                  <span className="station-note">{picking === item.id ? "Loading" : item.note}</span>
-                </span>
+                <i className="led" aria-hidden />
+                <span>{picking === item.id ? "…" : item.name}</span>
               </button>
             ))}
           </div>
@@ -359,6 +361,7 @@ export function Deck() {
                 autoCapitalize="off"
                 autoCorrect="off"
                 spellCheck={false}
+                autoFocus
                 enterKeyHint="search"
               />
               <button className="load" type="submit" disabled={busy || raw.trim().length < 2}>
@@ -416,7 +419,6 @@ export function Deck() {
         )}
         <div className="underglow" />
       </div>
-      <DashCam />
     </div>
   );
 }

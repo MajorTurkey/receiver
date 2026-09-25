@@ -63,6 +63,10 @@
 
 .dash {
   height: 100%;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto auto;
   gap: 0.55rem;
@@ -85,6 +89,23 @@
 .bezel strong {
   color: var(--color-fg);
   font-weight: 700;
+}
+
+.bezel-side {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bezel-side time {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-fg);
+  letter-spacing: 0.08em;
+}
+
+.bezel-side time span {
+  margin-left: 0.35rem;
+  color: var(--lamp);
 }
 
 .swatches {
@@ -114,8 +135,10 @@
 
 .screen {
   min-height: 0;
+  min-width: 0;
+  max-width: 100%;
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(15rem, 0.72fr);
+  grid-template-columns: minmax(0, 1.35fr) minmax(17rem, 0.8fr);
   gap: 0.7rem;
 }
 
@@ -156,31 +179,51 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 0.4rem;
+  justify-content: flex-end;
+  gap: 0.55rem;
 }
 
-.meridian {
+.readout {
+  min-width: 0;
+  margin-bottom: auto;
+}
+
+.source {
+  margin: 0 0 0.35rem;
   color: var(--lamp);
-  font-size: 0.85rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.18em;
-}
-
-.wall {
-  margin: 0;
-  font-size: clamp(3.4rem, 7.2vw, 6.4rem);
-  font-weight: 650;
-  letter-spacing: -0.045em;
-  line-height: 0.82;
+  text-transform: uppercase;
 }
 
 .track-title {
   margin: 0;
-  font-size: clamp(1.45rem, 2.4vw, 2.15rem);
+  font-size: clamp(1.35rem, 2.2vw, 1.9rem);
   font-weight: 650;
-  line-height: 1.05;
+  line-height: 1.12;
   letter-spacing: -0.03em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.artist {
+  margin: 0.35rem 0 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-muted);
+  font-size: 1rem;
+}
+
+.time-row {
+  display: flex;
+  justify-content: space-between;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85rem;
+  color: var(--color-muted);
 }
 
 .transport {
@@ -206,7 +249,7 @@
 .pad {
   display: grid;
   place-items: center;
-  height: 4.6rem;
+  height: 3.35rem;
 }
 
 .pad:active,
@@ -251,19 +294,22 @@
 }
 
 .dock {
-  display: grid;
-  grid-template-columns: 4.6rem minmax(0, 1fr);
-  gap: 0.55rem;
+  display: flex;
+  gap: 0.4rem;
   align-items: center;
-  min-height: 0;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .search-key {
-  height: 4.6rem;
-  display: grid;
-  place-items: center;
-  align-content: center;
-  gap: 0.15rem;
+  flex: 0 0 auto;
+  height: 2.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0 0.7rem;
   border: 1px solid #07080a;
   border-radius: 2px;
   background-image: linear-gradient(180deg, var(--metal-hi), var(--metal) 46%, var(--metal-lo));
@@ -272,10 +318,15 @@
     0 1px 0 rgb(255 255 255 / 6%);
   color: #f3f0ea;
   font-family: Oswald, "Arial Narrow", sans-serif;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 500;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.search-key svg {
+  width: 1rem;
+  height: 1rem;
 }
 
 .search-key[data-on="true"] {
@@ -287,11 +338,53 @@
 
 .stations {
   display: flex;
-  gap: 0.65rem;
+  flex: 1 1 0;
+  gap: 0.4rem;
   min-width: 0;
   overflow-x: auto;
   touch-action: pan-x;
-  padding: 0.15rem 0.1rem;
+  padding-bottom: 0.1rem;
+}
+
+.genre {
+  flex: 0 0 auto;
+  min-width: 5.5rem;
+  height: 2.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0 0.75rem;
+  border: 1px solid #07080a;
+  border-radius: 2px;
+  background-image: linear-gradient(180deg, var(--metal-hi), var(--metal) 46%, var(--metal-lo));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%);
+  color: #f3f0ea;
+  font-family: Oswald, "Arial Narrow", sans-serif;
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.genre .led {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: #2a3038;
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 70%);
+}
+
+.genre[data-on="true"] {
+  color: #fff;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 24%),
+    inset 0 0 0 1px color-mix(in oklab, var(--lamp) 55%, transparent);
+}
+
+.genre[data-on="true"] .led {
+  background: var(--lamp);
+  box-shadow: 0 0 8px var(--lamp);
 }
 
 .station {
@@ -467,6 +560,8 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.55rem;
   align-items: stretch;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .program {
@@ -491,22 +586,20 @@
 
 .program-row {
   width: 100%;
-  height: 1.85rem;
+  min-height: 2.15rem;
   display: grid;
-  grid-template-columns: 2.4rem minmax(0, 1fr);
+  grid-template-columns: 2.2rem minmax(0, 1fr);
   align-items: center;
   gap: 0.35rem;
   padding: 0 0.7rem;
   border: 0;
   border-radius: 0;
   background: transparent;
-  color: #8b95a3;
+  color: #c5ccd6;
   text-align: left;
-  font-family: Oswald, "Arial Narrow", sans-serif;
   font-size: 0.92rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-weight: 550;
+  letter-spacing: 0;
 }
 
 .program-no {
@@ -542,7 +635,9 @@
 
 .link-row input {
   height: 2.7rem;
-  width: 14rem;
+  flex: 1;
+  min-width: 0;
+  width: auto;
   border-radius: 2px;
   border: 1px solid #07080a;
   background: #050607;
@@ -587,10 +682,10 @@
 }
 
 .underglow {
-  height: 4px;
+  height: 2px;
   margin: 0 -0.7rem -0.45rem;
   background: var(--lamp);
-  box-shadow: 0 0 18px var(--lamp);
+  opacity: 0.85;
 }
 
 .scrub {
@@ -658,29 +753,24 @@
 }
 
 .cam {
-  position: absolute;
-  z-index: 4;
-  top: 2.6rem;
-  left: 0.85rem;
+  position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.4rem;
+  align-items: center;
 }
 
 .cam-btn {
   touch-action: manipulation;
-  height: 2.4rem;
-  padding: 0 0.8rem;
+  height: 1.7rem;
+  padding: 0 0.55rem;
   border-radius: 2px;
   border: 1px solid #07080a;
   background-image: linear-gradient(180deg, #3a4048, #1c2026);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%);
   color: #f3f0ea;
   font-family: Oswald, "Arial Narrow", sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
@@ -691,9 +781,12 @@
 }
 
 .cam-note {
-  max-width: 10.5rem;
+  position: absolute;
+  top: calc(100% + 0.3rem);
+  right: 0;
+  width: 11rem;
   margin: 0;
-  text-align: left;
+  text-align: right;
   font-size: 0.72rem;
   line-height: 1.2;
   color: #c5ccd6;
