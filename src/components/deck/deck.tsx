@@ -262,26 +262,29 @@ export function Deck() {
               className="key"
               onClick={() => tune(item.id)}
             >
+              <i className="led" aria-hidden />
               <span className="key-name">{item.name}</span>
             </button>
           ))}
         </div>
 
         <div className="bay">
-          <div className="queue" aria-label="Queue">
+          <ol className="program" aria-label="Queue">
             {queue.map((item, i) => (
-              <button
-                key={`${item.id}-${i}`}
-                type="button"
-                className="chip"
-                data-on={i === index}
-                onClick={() => play(i)}
-              >
-                <span>{item.title}</span>
-              </button>
+              <li key={`${item.id}-${i}`}>
+                <button
+                  type="button"
+                  className="program-row"
+                  data-on={i === index}
+                  onClick={() => play(i)}
+                >
+                  <span className="program-no">{pad(i + 1)}</span>
+                  <span className="program-title">{item.title}</span>
+                </button>
+              </li>
             ))}
-          </div>
-          <form onSubmit={onAdd}>
+          </ol>
+          <form className="slot" onSubmit={onAdd}>
             <label className="sr-only" htmlFor="link">
               YouTube Music link
             </label>
@@ -290,17 +293,17 @@ export function Deck() {
                 id="link"
                 value={raw}
                 onChange={(event) => setRaw(event.target.value)}
-                placeholder="Paste a link"
+                placeholder="Load a link"
                 autoCapitalize="off"
                 autoCorrect="off"
                 spellCheck={false}
                 inputMode="url"
               />
-              <button className="add" type="submit" disabled={busy || raw.trim().length === 0}>
-                {busy ? "…" : "Add"}
+              <button className="load" type="submit" disabled={busy || raw.trim().length === 0}>
+                {busy ? "…" : "Load"}
               </button>
             </div>
-            {notice ? <p className="mt-1 text-xs text-muted">{notice}</p> : null}
+            {notice ? <p className="slot-note">{notice}</p> : null}
           </form>
         </div>
         <div className="underglow" />

@@ -45,10 +45,14 @@
 .deck {
   --lamp: #ff7a2f;
   --lamp-ink: #1a0c04;
+  --metal: #23272d;
+  --metal-hi: #3a4048;
+  --metal-lo: #121418;
   position: relative;
   height: 100dvh;
   overflow: hidden;
-  background: #07080c;
+  background:
+    linear-gradient(180deg, #32373e 0%, #1c2026 22%, #14171b 100%);
   color: var(--color-fg);
 }
 
@@ -121,11 +125,14 @@
   display: grid;
   place-items: center;
   container-type: size;
-  border-radius: 0.7rem;
+  border-radius: 2px;
   background: #000;
-  border: 1px solid #242b38;
+  border: 1px solid #0a0c0f;
   overflow: hidden;
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--lamp) 35%, transparent);
+  box-shadow:
+    inset 0 0 0 1px #2c323a,
+    inset 0 12px 28px rgb(0 0 0 / 55%),
+    0 1px 0 rgb(255 255 255 / 8%);
 }
 
 .stage {
@@ -184,44 +191,40 @@
 
 .pad,
 .key,
-.chip,
-.add {
-  --glass: #d7dde8;
-  --fill: 16%;
-  border: 1px solid color-mix(in oklab, var(--glass) 42%, white 18%);
-  border-radius: 999px;
-  background-color: color-mix(in oklab, var(--glass) var(--fill), rgb(7 9 14 / 62%));
-  background-image: linear-gradient(
-    180deg,
-    color-mix(in oklab, white 24%, transparent),
-    color-mix(in oklab, white 5%, transparent) 42%,
-    transparent 43%
-  );
+.load {
+  border: 1px solid #07080a;
+  border-radius: 2px;
+  background-color: var(--metal);
+  background-image: linear-gradient(180deg, var(--metal-hi), var(--metal) 46%, var(--metal-lo));
   box-shadow:
-    inset 0 1px 0 color-mix(in oklab, white 48%, transparent),
-    inset 0 -1px 0 color-mix(in oklab, black 42%, transparent),
-    inset 0 -12px 18px color-mix(in oklab, black 16%, transparent);
-  backdrop-filter: blur(18px) saturate(1.4);
+    inset 0 1px 0 rgb(255 255 255 / 22%),
+    inset 0 -1px 0 rgb(0 0 0 / 55%),
+    0 1px 0 rgb(255 255 255 / 6%);
+  color: #e7ebf0;
 }
 
 .pad {
   display: grid;
   place-items: center;
   height: 4.6rem;
-  color: var(--color-fg);
 }
 
 .pad:active,
 .key:active,
-.chip:active,
-.add:active {
+.load:active,
+.program-row:active {
   transform: translateY(1px);
+  box-shadow:
+    inset 0 2px 4px rgb(0 0 0 / 45%),
+    inset 0 1px 0 rgb(255 255 255 / 8%);
 }
 
 .pad-play {
-  --glass: var(--lamp);
-  --fill: 42%;
   color: #fff;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 28%),
+    inset 0 0 0 1px color-mix(in oklab, var(--lamp) 55%, transparent),
+    0 0 12px color-mix(in oklab, var(--lamp) 35%, transparent);
 }
 
 .pad-play svg {
@@ -230,8 +233,8 @@
 
 .pad:focus-visible,
 .key:focus-visible,
-.chip:focus-visible,
-.add:focus-visible {
+.load:focus-visible,
+.program-row:focus-visible {
   outline: 2px solid color-mix(in oklab, var(--lamp) 75%, white);
   outline-offset: 3px;
 }
@@ -246,19 +249,25 @@
 .dock {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.65rem;
+  gap: 0.45rem;
+  padding: 0.35rem;
+  border-radius: 2px;
+  background: #0c0e11;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 6%),
+    inset 0 8px 16px rgb(0 0 0 / 35%);
 }
 
 .key {
-  --glass: var(--key);
   --key: #ff7a2f;
-  --fill: 20%;
-  min-height: 4.75rem;
+  min-height: 4.4rem;
   display: grid;
-  place-items: center;
-  padding: 0.35rem 1.15rem 0.2rem;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+  align-content: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.4rem;
   text-align: center;
-  color: #f7f4ef;
 }
 
 .key[data-tone="amber"] { --key: #ff8a3d; }
@@ -266,123 +275,155 @@
 .key[data-tone="cobalt"] { --key: #6aa2ff; }
 .key[data-tone="rose"] { --key: #ff6b9d; }
 
-.key[data-on="false"] {
-  --fill: 12%;
+.led {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: #2a3038;
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 70%);
 }
 
 .key[data-on="true"] {
-  --fill: 40%;
-  box-shadow:
-    inset 0 1px 0 color-mix(in oklab, white 55%, transparent),
-    inset 0 -1px 0 color-mix(in oklab, black 30%, transparent),
-    inset 0 0 22px color-mix(in oklab, var(--key) 42%, transparent);
+  background-image: linear-gradient(180deg, #454b54, #2a2f36 48%, #16191d);
+}
+
+.key[data-on="true"] .led {
+  background: var(--key);
+  box-shadow: 0 0 8px var(--key);
 }
 
 .key-name {
   display: block;
-  margin-right: -0.16em;
   font-family: Oswald, "Arial Narrow", sans-serif;
-  font-size: 1.4rem;
+  font-size: 1.15rem;
   font-weight: 500;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   line-height: 1;
-  transform: translateY(0.06em);
+  color: #f3f0ea;
 }
 
 .bay {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.55rem;
-  align-items: center;
+  align-items: stretch;
 }
 
-.queue {
-  display: flex;
-  gap: 0.45rem;
-  overflow-x: auto;
+.program {
+  list-style: none;
+  margin: 0;
   min-width: 0;
-  touch-action: pan-x;
+  max-height: 4.7rem;
+  overflow-y: auto;
+  padding: 0.15rem 0;
+  border-radius: 2px;
+  background: #050607;
+  border: 1px solid #07080a;
+  box-shadow:
+    inset 0 0 0 1px #2a3038,
+    inset 0 10px 18px rgb(0 0 0 / 55%);
+  touch-action: pan-y;
 }
 
-.chip {
-  flex: 0 0 auto;
-  max-width: 16rem;
-  height: 3.15rem;
+.program li {
+  margin: 0;
+}
+
+.program-row {
+  width: 100%;
+  height: 1.85rem;
   display: grid;
-  place-items: center;
-  padding: 0.15rem 1.2rem 0;
-  text-align: center;
-  color: #f4f1ea;
+  grid-template-columns: 2.4rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0 0.7rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #8b95a3;
+  text-align: left;
   font-family: Oswald, "Arial Narrow", sans-serif;
   font-size: 0.92rem;
   font-weight: 500;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.chip span {
-  display: block;
-  max-width: 13.5rem;
-  margin-right: -0.12em;
+.program-no {
+  font-variant-numeric: tabular-nums;
+  color: #5e6876;
+}
+
+.program-title {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  transform: translateY(0.05em);
 }
 
-.chip[data-on="true"] {
-  --glass: var(--lamp);
-  --fill: 40%;
-  color: #fff;
+.program-row[data-on="true"] {
+  color: var(--lamp);
+  background: color-mix(in oklab, var(--lamp) 14%, transparent);
+}
+
+.program-row[data-on="true"] .program-no {
+  color: var(--lamp);
+}
+
+.slot {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .link-row {
   display: flex;
-  gap: 0.45rem;
+  gap: 0.4rem;
 }
 
 .link-row input {
-  height: 3.15rem;
-  width: 16rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in oklab, white 22%, transparent);
-  background-color: rgb(8 10 16 / 55%);
-  background-image: linear-gradient(180deg, color-mix(in oklab, white 14%, transparent), transparent 46%);
-  box-shadow: inset 0 1px 0 color-mix(in oklab, white 28%, transparent);
+  height: 2.7rem;
+  width: 14rem;
+  border-radius: 2px;
+  border: 1px solid #07080a;
+  background: #050607;
+  box-shadow:
+    inset 0 0 0 1px #2a3038,
+    inset 0 8px 14px rgb(0 0 0 / 45%);
+  color: #e7ebf0;
+  padding: 0 0.75rem;
 }
 
-.add {
-  height: 3.15rem;
-  min-width: 5.25rem;
-  padding: 0.12rem 1.25rem 0;
-  color: #fff;
+.load {
+  height: 2.7rem;
+  min-width: 4.6rem;
+  padding: 0 0.85rem;
   font-family: Oswald, "Arial Narrow", sans-serif;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 500;
-  letter-spacing: 0.18em;
-  text-indent: 0.18em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  --glass: var(--lamp);
-  --fill: 34%;
+  color: #fff;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 24%),
+    inset 0 0 0 1px color-mix(in oklab, var(--lamp) 45%, transparent);
 }
 
-.add:disabled {
+.load:disabled {
   opacity: 0.4;
+}
+
+.slot-note {
+  margin: 0.25rem 0 0;
+  font-size: 0.72rem;
+  color: var(--color-muted);
 }
 
 @media (hover: hover) {
   .key:hover,
   .pad:hover,
-  .chip:hover,
-  .add:hover:not(:disabled) {
-    --fill: 28%;
-  }
-
-  .key[data-on="true"]:hover,
-  .pad-play:hover,
-  .chip[data-on="true"]:hover {
-    --fill: 48%;
+  .load:hover:not(:disabled) {
+    background-image: linear-gradient(180deg, #4a515a, #323840 48%, #1a1e23);
   }
 }
 
@@ -470,19 +511,17 @@
 
 .cam-btn {
   touch-action: manipulation;
-  height: 2.55rem;
-  padding: 0.1rem 0.95rem 0;
-  border-radius: 999px;
-  border: 1px solid color-mix(in oklab, white 28%, transparent);
-  background-color: rgb(8 10 16 / 62%);
-  background-image: linear-gradient(180deg, color-mix(in oklab, white 18%, transparent), transparent 46%);
-  box-shadow: inset 0 1px 0 color-mix(in oklab, white 32%, transparent);
-  color: #f6f3ee;
+  height: 2.4rem;
+  padding: 0 0.8rem;
+  border-radius: 2px;
+  border: 1px solid #07080a;
+  background-image: linear-gradient(180deg, #3a4048, #1c2026);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%);
+  color: #f3f0ea;
   font-family: Oswald, "Arial Narrow", sans-serif;
-  font-size: 0.92rem;
+  font-size: 0.85rem;
   font-weight: 500;
-  letter-spacing: 0.16em;
-  text-indent: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
