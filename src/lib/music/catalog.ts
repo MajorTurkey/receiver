@@ -11,57 +11,42 @@ export const TONES: Tone[] = ["amber", "teal", "cobalt", "rose", "gold"];
 export type Station = {
   id: string;
   name: string;
+  mark: string;
   note: string;
+  query: string;
   tone: Tone;
   tracks: Track[];
 };
 
 export const STATIONS: Station[] = [
   {
-    id: "late",
-    name: "Late room",
-    note: "Long mixes",
+    id: "rock",
+    name: "Rock",
+    mark: "RK",
+    note: "Genre",
+    query: "rock songs official video",
     tone: "amber",
     tracks: [
-      { id: "jfKfPfyJRdk", title: "Beats to relax", author: "Lofi Girl" },
-      { id: "lTRiuFIWV54", title: "1 A.M. session", author: "Lofi Girl" },
-      { id: "7NOSDKb0HlU", title: "Study radio", author: "Chillhop Music" },
-    ],
-  },
-  {
-    id: "still",
-    name: "Still",
-    note: "Ambient",
-    tone: "teal",
-    tracks: [
-      { id: "DWcJFNfaw9c", title: "Beats to sleep", author: "Lofi Girl" },
-      { id: "2OEL4P1Rz04", title: "Hidden Valley", author: "Soothing Relaxation" },
-      { id: "4xDzrJKXOOY", title: "Synthwave radio", author: "Lofi Girl" },
-    ],
-  },
-  {
-    id: "keys",
-    name: "Keys",
-    note: "Piano and jazz",
-    tone: "cobalt",
-    tracks: [
-      { id: "9E6b3swbnWg", title: "Nocturne in E-flat", author: "Chopin" },
-      { id: "kgx4WGK0oNU", title: "Jazz room", author: "Abao in Tokyo" },
-      { id: "mQER0A0ej0M", title: "Hey Jude", author: "The Beatles" },
-    ],
-  },
-  {
-    id: "singles",
-    name: "Singles",
-    note: "Official videos",
-    tone: "rose",
-    tracks: [
       { id: "fJ9rUzIMcZQ", title: "Bohemian Rhapsody", author: "Queen" },
+      { id: "hTWKbfoikeg", title: "Smells Like Teen Spirit", author: "Nirvana" },
       { id: "kXYiU_JCYtU", title: "Numb", author: "Linkin Park" },
-      { id: "YykjpeuMNEk", title: "Hymn for the Weekend", author: "Coldplay" },
-      { id: "e-ORhEE9VVg", title: "Blank Space", author: "Taylor Swift" },
     ],
   },
+  { id: "rap", name: "Rap", mark: "RAP", note: "Genre", query: "rap songs official video", tone: "rose", tracks: [] },
+  { id: "country", name: "Country", mark: "CTY", note: "Genre", query: "country songs official video", tone: "gold", tracks: [] },
+  { id: "rnb", name: "R&B", mark: "R&B", note: "Genre", query: "r&b songs official video", tone: "cobalt", tracks: [] },
+  { id: "pop", name: "Pop", mark: "POP", note: "Genre", query: "pop songs official video", tone: "teal", tracks: [] },
+  { id: "latin", name: "Latin", mark: "LAT", note: "Genre", query: "latin songs official video", tone: "amber", tracks: [] },
+  { id: "electronic", name: "Electronic", mark: "EDM", note: "Genre", query: "electronic songs official video", tone: "teal", tracks: [] },
+  { id: "jazz", name: "Jazz", mark: "JAZ", note: "Genre", query: "jazz songs official video", tone: "gold", tracks: [] },
+  { id: "metal", name: "Metal", mark: "MTL", note: "Genre", query: "metal songs official video", tone: "rose", tracks: [] },
+  { id: "indie", name: "Indie", mark: "IND", note: "Genre", query: "indie songs official video", tone: "cobalt", tracks: [] },
+  { id: "soul", name: "Soul", mark: "SOL", note: "Genre", query: "soul songs official video", tone: "amber", tracks: [] },
+  { id: "reggae", name: "Reggae", mark: "REG", note: "Genre", query: "reggae songs official video", tone: "teal", tracks: [] },
+  { id: "blues", name: "Blues", mark: "BLU", note: "Genre", query: "blues songs official video", tone: "cobalt", tracks: [] },
+  { id: "classical", name: "Classical", mark: "CLS", note: "Genre", query: "classical music official", tone: "gold", tracks: [] },
+  { id: "folk", name: "Folk", mark: "FLK", note: "Genre", query: "folk songs official video", tone: "amber", tracks: [] },
+  { id: "alternative", name: "Alternative", mark: "ALT", note: "Genre", query: "alternative songs official video", tone: "rose", tracks: [] },
 ];
 
 export const DEFAULT_STATION = STATIONS[0];

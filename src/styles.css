@@ -316,8 +316,8 @@
   background: #ff7a2f;
   color: #1a0c04;
   font-family: Oswald, "Arial Narrow", sans-serif;
-  font-size: 1.35rem;
-  letter-spacing: 0.04em;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
 }
 
 .station-art[data-tone="teal"] { background: #1ec8b8; color: #04221e; }

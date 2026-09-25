@@ -1,7 +1,7 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { Pause, Play, Search, SkipBack, SkipForward } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { STATIONS, TONES, type Track } from "@/lib/music/catalog";
+import { STATIONS, TONES, type Station, type Track } from "@/lib/music/catalog";
 import { parseVideoId } from "@/lib/music/parse";
 import { resolveTrack } from "@/lib/music/resolve";
 import { searchCatalog, searchMore } from "@/lib/music/search";
@@ -11,6 +11,12 @@ import { DashCam } from "./dashcam";
 
 function pad(n: number) {
   return String(n).padStart(2, "0");
+}
+
+function preferSongs(tracks: Track[]) {
+  const noise = /\bmix\b|playlist|nonstop|throwback|compilation|dj set|\bhours?\b/i;
+  const songs = tracks.filter((track) => !noise.test(track.title));
+  return songs.length >= 5 ? songs : tracks;
 }
 
 function clock(total: number) {
@@ -24,7 +30,6 @@ export function Deck() {
   const stationId = useDeck((s) => s.stationId);
   const queue = useDeck((s) => s.queue);
   const index = useDeck((s) => s.index);
-  const tune = useDeck((s) => s.tune);
   const paint = useDeck((s) => s.paint);
   const tone = useDeck((s) => s.tone);
   const play = useDeck((s) => s.play);
@@ -39,8 +44,10 @@ export function Deck() {
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [finder, setFinder] = useState(false);
+  const [picking, setPicking] = useState<string | null>(null);
   const [hits, setHits] = useState<Track[]>([]);
   const [more, setMore] = useState<string | null>(null);
+  const pickRef = useRef(0);
   const [playing, setPlaying] = useState(false);
   const [command, setCommand] = useState<"play" | "pause" | null>(null);
   const [seekTo, setSeekTo] = useState<number | null>(null);
@@ -138,6 +145,27 @@ export function Deck() {
     return () => window.removeEventListener("keydown", onKey);
   }, [next, prev, playing]);
 
+  async function openGenre(item: Station) {
+    const ticket = pickRef.current + 1;
+    pickRef.current = ticket;
+    setPicking(item.id);
+    setFinder(false);
+    setNotice(null);
+    try {
+      const page = await searchCatalog({ data: { query: item.query } });
+      if (ticket !== pickRef.current) return;
+      load(preferSongs(page.tracks), 0, item.id);
+      setMore(page.more);
+    } catch (err) {
+      if (ticket !== pickRef.current) return;
+      if (item.tracks.length > 0) load(item.tracks, 0, item.id);
+      setMore(null);
+      setNotice(err instanceof Error ? err.message : "That genre did not load.");
+    } finally {
+      if (ticket === pickRef.current) setPicking(null);
+    }
+  }
+
   async function onAdd(event: FormEvent) {
     event.preventDefault();
     const text = raw.trim();
@@ -170,10 +198,16 @@ export function Deck() {
     setNotice(null);
     try {
       const page = await searchMore({ data: { token: more } });
-      setHits((current) => {
-        const seen = new Set(current.map((item) => item.id));
-        return [...current, ...page.tracks.filter((item) => !seen.has(item.id))];
-      });
+      if (finder) {
+        setHits((current) => {
+          const seen = new Set(current.map((item) => item.id));
+          return [...current, ...page.tracks.filter((item) => !seen.has(item.id))];
+        });
+      } else {
+        const seen = new Set(queue.map((item) => item.id));
+        const next = [...queue, ...page.tracks.filter((item) => !seen.has(item.id))];
+        load(next, index, stationId);
+      }
       setMore(page.more);
     } catch (err) {
       setNotice(err instanceof Error ? err.message : "No further songs.");
@@ -290,24 +324,21 @@ export function Deck() {
             <Search className="size-6" />
             <span>Search</span>
           </button>
-          <div className="stations" aria-label="Stations">
+          <div className="stations" aria-label="Genres">
             {STATIONS.map((item) => (
               <button
                 key={item.id}
                 type="button"
                 className="station"
-                data-on={item.id === stationId}
-                onClick={() => {
-                  tune(item.id);
-                  setFinder(false);
-                }}
+                data-on={item.id === stationId || item.id === picking}
+                onClick={() => void openGenre(item)}
               >
                 <span className="station-art" data-tone={item.tone}>
-                  {item.name.slice(0, 1)}
+                  {item.mark}
                 </span>
                 <span className="station-copy">
                   <span className="station-name">{item.name}</span>
-                  <span className="station-note">{item.note}</span>
+                  <span className="station-note">{picking === item.id ? "Loading" : item.note}</span>
                 </span>
               </button>
             ))}
@@ -375,6 +406,12 @@ export function Deck() {
                 </li>
               ))}
             </ol>
+            {more ? (
+              <button className="more" type="button" disabled={busy} onClick={onMore}>
+                More
+              </button>
+            ) : null}
+            {notice ? <p className="slot-note">{notice}</p> : null}
           </div>
         )}
         <div className="underglow" />
