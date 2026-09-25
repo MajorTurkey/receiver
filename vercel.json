@@ -1,0 +1,18 @@
+{
+  "headers": [
+    {
+      "source": "/download/(.*)\\.aab",
+      "headers": [
+        { "key": "Content-Type", "value": "application/octet-stream" },
+        { "key": "Content-Disposition", "value": "attachment; filename=\"receiver-1.0.0.aab\"" }
+      ]
+    },
+    {
+      "source": "/download/(.*)\\.apk",
+      "headers": [
+        { "key": "Content-Type", "value": "application/vnd.android.package-archive" },
+        { "key": "Content-Disposition", "value": "attachment; filename=\"receiver-1.0.0.apk\"" }
+      ]
+    }
+  ]
+}
